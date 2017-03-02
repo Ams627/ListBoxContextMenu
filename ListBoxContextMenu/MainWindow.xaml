@@ -1,22 +1,44 @@
-﻿<Window x:Class="ListBoxContextMenu.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ListBoxContextMenu"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <StackPanel>
-            <TextBlock Text="ListBox here:"/>
-            <ListBox ItemsSource="{Binding Items}" MinHeight="100" TabIndex="0">
+﻿    <Window x:Class="ListBoxContextMenu.MainWindow"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:local="clr-namespace:ListBoxContextMenu"
+            mc:Ignorable="d"
+            Title="MainWindow" Height="350" Width="525">
+        <Window.Resources>
+            <local:BindingProxy x:Key="Proxy" Data="{Binding}"/>
+        </Window.Resources>
+        <Grid>
+            <StackPanel>
+                <TextBlock Text="ListBox here:"/>
+                <ListBox ItemsSource="{Binding Items}" MinHeight="100" TabIndex="0" x:Name="LB" Margin="0,0,0.4,0">
                 <ListBox.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Foo" Command="{Binding ContCommand}"/>
-                        <MenuItem Header="Bar" Command="{Binding ContCommand}"/>
+                    <ContextMenu ItemsSource="{Binding ContextItems}">
+                        <ContextMenu.Resources>
+                            <ControlTemplate x:Key="MenuSeparatorTemplate">
+                                <Separator Margin="20,0,0,0"/>
+                            </ControlTemplate>
+                        </ContextMenu.Resources>
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Command" Value="{Binding Source={StaticResource Proxy},Path=Data.ContCommand}" />
+                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding }" Value="{x:Null}">
+                                        <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+                        <ContextMenu.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ContextMenu.ItemTemplate>
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
-        </StackPanel>
-    </Grid>
-</Window>
+            </StackPanel>
+        </Grid>
+    </Window>
