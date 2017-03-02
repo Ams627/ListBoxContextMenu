@@ -23,7 +23,8 @@
                         <ContextMenu.ItemContainerStyle>
                             <Style TargetType="MenuItem">
                                 <Setter Property="Command" Value="{Binding Source={StaticResource Proxy},Path=Data.ContCommand}" />
-                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}" />
+                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" />
+                                <!--<Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}" />-->
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding }" Value="{x:Null}">
                                         <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
