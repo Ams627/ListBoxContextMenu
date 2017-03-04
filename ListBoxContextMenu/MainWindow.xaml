@@ -1,19 +1,28 @@
-﻿    <Window x:Class="ListBoxContextMenu.MainWindow"
+﻿<Window x:Class="ListBoxContextMenu.MainWindow"
             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:local="clr-namespace:ListBoxContextMenu"
+            xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
             mc:Ignorable="d"
             Title="MainWindow" Height="350" Width="525">
-        <Window.Resources>
-            <local:BindingProxy x:Key="Proxy" Data="{Binding}"/>
-        </Window.Resources>
-        <Grid>
-            <StackPanel>
-                <TextBlock Text="ListBox here:"/>
-                <ListBox ItemsSource="{Binding Items}" MinHeight="100" TabIndex="0" x:Name="LB" Margin="0,0,0.4,0">
+    <Window.Resources>
+        <local:BindingProxy x:Key="Proxy" Data="{Binding}"/>
+    </Window.Resources>
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="ListBox here:"/>
+            <ListBox ItemsSource="{Binding Items}" MinHeight="100" TabIndex="0" x:Name="LB" Margin="0,0,0.4,0">
+                <!-- Add trigger to map ContextMenu opening event to a command in the viewmodel -->
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="ContextMenuOpening">
+                        <i:InvokeCommandAction Command="{Binding RightCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=SelectedItem}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <!-- Bind context menu to the view model -->
                 <ListBox.ContextMenu>
+                    <!-- context menu items are bound to the VM -->
                     <ContextMenu ItemsSource="{Binding ContextItems}">
                         <ContextMenu.Resources>
                             <ControlTemplate x:Key="MenuSeparatorTemplate">
@@ -22,9 +31,18 @@
                         </ContextMenu.Resources>
                         <ContextMenu.ItemContainerStyle>
                             <Style TargetType="MenuItem">
+                                <!-- context menu command is bound to the VM -->
                                 <Setter Property="Command" Value="{Binding Source={StaticResource Proxy},Path=Data.ContCommand}" />
-                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" />
-                                <!--<Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}" />-->
+                                <!-- context menu command parameter is bound to the VM - it contains both the item right-clicked on and the context menu item selected: -->
+                                <Setter Property="CommandParameter">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{local:ContextMultiValueConverter}">
+                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}" Path="PlacementTarget.SelectedItem"/>
+                                            <Binding RelativeSource="{RelativeSource Self}" Path="Header.Name"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                                <!-- add a separator if an item is null: -->
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding }" Value="{x:Null}">
                                         <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
@@ -32,6 +50,7 @@
                                 </Style.Triggers>
                             </Style>
                         </ContextMenu.ItemContainerStyle>
+                        <!-- how each context menu item looks: -->
                         <ContextMenu.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}"/>
@@ -40,6 +59,6 @@
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
-            </StackPanel>
-        </Grid>
-    </Window>
+        </StackPanel>
+    </Grid>
+</Window>

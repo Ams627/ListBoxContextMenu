@@ -20,9 +20,17 @@ namespace ListBoxContextMenu
             InitializeComponent();
             DataContext = this;
             Loaded += (sender, e) => MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-            ContCommand = new RelayCommand<object>((object o) =>
+            ContCommand = new RelayCommand<object>((o) =>
             {
-                System.Diagnostics.Debug.WriteLine("Context Menu pressed");
+            });
+
+            RightCommand = new RelayCommand<object>((o) =>
+            {
+                ContextItems.Clear();
+                string itemClicked = (string) o;
+                ContextItems.Add(new Context() { Name = "Foo " + itemClicked, Enabled = false, guid = Guid.NewGuid() });
+                ContextItems.Add(new Context() { Name = "Bar " + itemClicked, Enabled = false, guid = Guid.NewGuid() });
+                ContextItems.Add(new Context(){Name = "Hello", Enabled = false, guid = Guid.NewGuid()});
             });
         }
 
@@ -34,8 +42,8 @@ namespace ListBoxContextMenu
         };
 
         public RelayCommand<object> ContCommand { get; set; }
-
-
+        public RelayCommand<object> RightCommand { get; set; }
+        
         public ObservableCollection<Context> ContextItems { get; set; } = new ObservableCollection<Context>
         {
             new Context() {Name = "Wonk", guid=Guid.NewGuid(), Enabled = true},
