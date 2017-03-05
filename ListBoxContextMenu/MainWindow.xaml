@@ -42,6 +42,7 @@
                                         </MultiBinding>
                                     </Setter.Value>
                                 </Setter>
+                                <Setter Property="InputGestureText" Value="{Binding Wonk}"/>
                                 <!-- add a separator if an item is null: -->
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding }" Value="{x:Null}">
